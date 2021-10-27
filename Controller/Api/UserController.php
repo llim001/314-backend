@@ -46,6 +46,49 @@ class UserController extends BaseController
         }
     }
 
+
+    public function searchUsersByRoleAction()
+    {
+        $strErrorDesc = '';
+        $requestMethod = $_SERVER["REQUEST_METHOD"];
+        $arrQueryStringParams = $this->getQueryStringParams();
+
+        if (strtoupper($requestMethod) == 'GET') {
+            try 
+            {
+                $userModel = new UserModel();
+                
+                $inputRole = '';
+                if (isset($arrQueryStringParams['role']) && $arrQueryStringParams['role']) {
+                    $inputRole = $arrQueryStringParams['role'];
+                }
+                $arrUsers = $userModel->getListOfUsersByRole($inputRole);
+                $responseData = json_encode($arrUsers);
+            } 
+            catch (Error $e) 
+            {
+                $strErrorDesc = $e->getMessage().'Something went wrong! Please contact support.';
+                $strErrorHeader = 'HTTP/1.1 500 Internal Server Error';
+            }
+        } else {
+            $strErrorDesc = 'Method not supported';
+            $strErrorHeader = 'HTTP/1.1 422 Unprocessable Entity';
+        }
+ 
+        // send output
+        if (!$strErrorDesc) {
+            $this->sendOutput(
+                $responseData,
+                array('Content-Type: application/json', 'HTTP/1.1 200 OK')
+            );
+        } else {
+            $this->sendOutput(json_encode(array('error' => $strErrorDesc)), 
+                array('Content-Type: application/json', $strErrorHeader)
+            );
+        }
+    }
+
+
     public function loginAction()
     {
         $strErrorDesc = '';
@@ -168,6 +211,53 @@ class UserController extends BaseController
                 }
 
                 $arrPrescriptions = $userModel->getPrescriptionByUsername($inputUsername);
+                $responseData = json_encode($arrPrescriptions);
+            } 
+            catch (Error $e) 
+            {
+                $strErrorDesc = $e->getMessage().'Something went wrong! Please contact support.';
+                $strErrorHeader = 'HTTP/1.1 500 Internal Server Error';
+            }
+        } else {
+            $strErrorDesc = 'Method not supported';
+            $strErrorHeader = 'HTTP/1.1 422 Unprocessable Entity';
+        }
+ 
+        // send output
+        if (!$strErrorDesc) {
+            $this->sendOutput(
+                $responseData,
+                array('Content-Type: application/json', 'HTTP/1.1 200 OK')
+            );
+        } else {
+            $this->sendOutput(json_encode(array('error' => $strErrorDesc)), 
+                array('Content-Type: application/json', $strErrorHeader)
+            );
+        }
+    }
+
+    /* Search prescription by Token function (Patients) */
+    public function searchPrescriptionByTokenAction()
+    {
+        $strErrorDesc = '';
+        $requestMethod = $_SERVER["REQUEST_METHOD"];
+        $arrQueryStringParams = $this->getQueryStringParams();
+
+        if (strtoupper($requestMethod) == 'GET') {
+            try 
+            {
+                $userModel = new UserModel();
+                
+                $inputUsername = '';
+                $token = '';
+                if (isset($arrQueryStringParams['username']) && $arrQueryStringParams['username']) {
+                    if (isset($arrQueryStringParams['token']) && $arrQueryStringParams['token']) {
+                        $inputUsername = $arrQueryStringParams['username'];
+                        $token = $arrQueryStringParams['token'];
+                    } 
+                }
+
+                $arrPrescriptions = $userModel->displayPrescriptionByToken($token, $inputUsername);
                 $responseData = json_encode($arrPrescriptions);
             } 
             catch (Error $e) 
