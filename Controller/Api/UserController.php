@@ -282,4 +282,96 @@ class UserController extends BaseController
             );
         }
     }
+
+    /** Get Patient Prescription given by specific doctor (Doctor) **/
+    public function patientPrescriptionAction()
+    {
+        $strErrorDesc = '';
+        $requestMethod = $_SERVER["REQUEST_METHOD"];
+        $arrQueryStringParams = $this->getQueryStringParams();
+
+        if (strtoupper($requestMethod) == 'GET') {
+            try 
+            {
+                $userModel = new UserModel();
+                
+                $doctorUsername = '';
+                if (isset($arrQueryStringParams['doctorusername']) && $arrQueryStringParams['doctorusername']) {
+                    $doctorUsername = $arrQueryStringParams['doctorusername'];
+                    
+                }
+
+                $arrPrescriptions = $userModel->getPatientsPrescription($doctorUsername);
+                $responseData = json_encode($arrPrescriptions);
+            } 
+            catch (Error $e) 
+            {
+                $strErrorDesc = $e->getMessage().'Something went wrong! Please contact support.';
+                $strErrorHeader = 'HTTP/1.1 500 Internal Server Error';
+            }
+        } else {
+            $strErrorDesc = 'Method not supported';
+            $strErrorHeader = 'HTTP/1.1 422 Unprocessable Entity';
+        }
+ 
+        // send output
+        if (!$strErrorDesc) {
+            $this->sendOutput(
+                $responseData,
+                array('Content-Type: application/json', 'HTTP/1.1 200 OK')
+            );
+        } else {
+            $this->sendOutput(json_encode(array('error' => $strErrorDesc)), 
+                array('Content-Type: application/json', $strErrorHeader)
+            );
+        }
+    }
+
+
+    /** Search Patient Prescription given by specific doctor by Patient ID (Doctor) **/
+    public function searchPatientPrescriptionAction()
+    {
+        $strErrorDesc = '';
+        $requestMethod = $_SERVER["REQUEST_METHOD"];
+        $arrQueryStringParams = $this->getQueryStringParams();
+
+        if (strtoupper($requestMethod) == 'GET') {
+            try 
+            {
+                $userModel = new UserModel();
+                
+                $doctorUsername = '';
+                if (isset($arrQueryStringParams['doctorusername']) && $arrQueryStringParams['doctorusername']) {
+                    if (isset($arrQueryStringParams['patientusername']) && $arrQueryStringParams['patientusername']) {
+                        $doctorUsername = $arrQueryStringParams['doctorusername'];
+                        $patientUsername = $arrQueryStringParams['patientusername'];
+                    }
+                    
+                }
+
+                $arrPrescriptions = $userModel->getPatientsPrescriptionByPatientId($doctorUsername, $patientUsername);
+                $responseData = json_encode($arrPrescriptions);
+            } 
+            catch (Error $e) 
+            {
+                $strErrorDesc = $e->getMessage().'Something went wrong! Please contact support.';
+                $strErrorHeader = 'HTTP/1.1 500 Internal Server Error';
+            }
+        } else {
+            $strErrorDesc = 'Method not supported';
+            $strErrorHeader = 'HTTP/1.1 422 Unprocessable Entity';
+        }
+ 
+        // send output
+        if (!$strErrorDesc) {
+            $this->sendOutput(
+                $responseData,
+                array('Content-Type: application/json', 'HTTP/1.1 200 OK')
+            );
+        } else {
+            $this->sendOutput(json_encode(array('error' => $strErrorDesc)), 
+                array('Content-Type: application/json', $strErrorHeader)
+            );
+        }
+    }
 }

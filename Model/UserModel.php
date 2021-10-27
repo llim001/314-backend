@@ -23,26 +23,32 @@ class UserModel extends Database
     public function getPrescriptionByUsername($usernameInput)
     {
         //return $this->select("SELECT token,doctor_username,medicine,dosage,date_issued FROM prescription WHERE username = ? ", ["s", $usernameInput]);
-		return $this->select("SELECT token,doctor_username,medicine,dosage,date_issued FROM prescription WHERE username = '$usernameInput'");
+		return $this->select("SELECT token,doctor_username,medicine,dosage,DATE_FORMAT(date_issued,'%d %b %Y')as date FROM prescription WHERE username = '$usernameInput'");
     }
 
 	//view prescription Doctor
-	public function getPrescriptionByDoctorUsername($usernameInput)
+	public function getPatientsPrescription($usernameInput)
     {
         //return $this->select("SELECT token,doctor_username,medicine,dosage,date_issued FROM prescription WHERE Doctor_Username = ? ", ["s", $usernameInput]);
-		return $this->select("SELECT token,doctor_username,medicine,dosage,date_issued FROM prescription WHERE Doctor_Username = '$usernameInput'");
+		return $this->select("SELECT token,doctor_username,username,medicine,dosage,DATE_FORMAT(date_issued,'%d %b %Y')as date FROM prescription WHERE Doctor_Username = '$usernameInput'");
+    }
+
+    public function getPatientsPrescriptionByPatientId($docUserInput, $patientUserInput)
+    {
+        //return $this->select("SELECT token,doctor_username,medicine,dosage,date_issued FROM prescription WHERE Doctor_Username = ? ", ["s", $usernameInput]);
+		return $this->select("SELECT token,doctor_username,username,medicine,dosage,DATE_FORMAT(date_issued,'%d %b %Y')as date FROM prescription WHERE Doctor_Username = '$docUserInput' AND username = '$patientUserInput'");
     }
 	
 	//view prescription pharmacist/Token
 	public function getPrescriptionByToken($token)
     {
-		return $this->select("SELECT token,doctor_username,medicine,dosage,date_issued FROM prescription WHERE Token = '$token'");
+		return $this->select("SELECT token,doctor_username,medicine,dosage,DATE_FORMAT(date_issued,'%d %b %Y')as date FROM prescription WHERE Token = '$token'");
     }
 
     //Display prescription by Token (Patients)
 	public function displayPrescriptionByToken($token, $usernameInput)
     {
-		return $this->select("SELECT token,doctor_username,medicine,dosage,date_issued FROM prescription WHERE Token = '$token' AND username = '$usernameInput'");
+		return $this->select("SELECT token,doctor_username,medicine,dosage,DATE_FORMAT(date_issued,'%d %b %Y')as date FROM prescription WHERE Token = '$token' AND username = '$usernameInput'");
     }
 	
 	//view prescription Doctor and patient
