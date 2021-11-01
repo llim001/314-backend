@@ -1,4 +1,7 @@
 <?php
+
+require("./sendgrid-php/sendgrid-php.php");
+
 class UserController extends BaseController
 {
     /**
@@ -41,6 +44,66 @@ class UserController extends BaseController
             );
         } else {
             $this->sendOutput(json_encode(array('error' => $strErrorDesc)), 
+                array('Content-Type: application/json', $strErrorHeader)
+            );
+        }
+    }
+
+    public function sendEmailAction()
+    {
+        $strErrorDesc = '';
+        $requestMethod = $_SERVER["REQUEST_METHOD"];
+        $arrQueryStringParams = $this->getQueryStringParams();
+
+        if (strtoupper($requestMethod) == 'GET') {
+            try
+            {
+                $inputEmail = '';
+                if (isset($arrQueryStringParams['email']) && $arrQueryStringParams['email']) {
+                    $inputEmail = $arrQueryStringParams['email'];
+                }
+                // SEND
+                $email = new \SendGrid\Mail\Mail();
+                $email->setFrom("prescriptionsystem@em4476.nameless.guardurl.com", "Prescription System");
+                $email->setSubject("Your Prescription String");
+                $email->addTo($inputEmail, "Patient");
+                $email->addContent("text/plain", "and easy to do anywhere, even with PHP + string");
+                $email->addContent(
+                    "text/html", "Hi <strong>username</strong>, this is the token to your prescription: <strong>Token</strong>"
+                );
+                $sendgrid = new \SendGrid(getenv('SENDGRID_API_KEY'));
+                try {
+                    $response = $sendgrid->send($email);
+//                    echo $response->statusCode() . "\n";
+//                    print_r($response->headers());
+                    echo $response->body() . "\n";
+                    $responseData = json_encode($response->body());
+
+                } catch (Exception $e) {
+//                    echo 'Caught exception: '. $e->getMessage() ."\n";
+                    $strErrorDesc = $e->getMessage().'Something went wrong! Please contact support.';
+                    $strErrorHeader = 'HTTP/1.1 500 Internal Server Error';
+                }
+
+            }
+            catch (Error $e)
+            {
+                $strErrorDesc = $e->getMessage().'Something went wrong! Please contact support.';
+                $strErrorHeader = 'HTTP/1.1 500 Internal Server Error';
+            }
+        } else {
+            $strErrorDesc = 'Method not supported';
+            $strErrorHeader = 'HTTP/1.1 422 Unprocessable Entity';
+        }
+
+        // send output
+        if (!$strErrorDesc) {
+            $this->sendOutput(
+                $responseData,
+                array('Content-Type: application/json', 'HTTP/1.1 200 OK')
+            );
+        } else {
+            $this->sendOutput(json_encode(array('error' => $strErrorDesc)),
                 array('Content-Type: application/json', $strErrorHeader)
             );
         }
