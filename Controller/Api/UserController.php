@@ -374,4 +374,171 @@ class UserController extends BaseController
             );
         }
     }
+
+
+    /** Doctor Prescribe Prescription to Patient  **/
+    public function addPatientPrescriptionAction()
+    {
+        $strErrorDesc = '';
+        $requestMethod = $_SERVER["REQUEST_METHOD"];
+        $arrQueryStringParams = $this->getQueryStringParams();
+
+        if (strtoupper($requestMethod) == 'GET') {
+            try 
+            {
+                $userModel = new UserModel();
+                $generatedToken = '';
+                $doctorUsername = '';
+                $patientUsername = '';
+                $medicine = '';
+                $dosage = '';
+
+                if (isset($arrQueryStringParams['token']) && $arrQueryStringParams['token']) {
+                    if (isset($arrQueryStringParams['doctorusername']) && $arrQueryStringParams['doctorusername']) {
+                        if (isset($arrQueryStringParams['patientusername']) && $arrQueryStringParams['patientusername']) {
+                            if (isset($arrQueryStringParams['medicine']) && $arrQueryStringParams['medicine']) {
+                                if (isset($arrQueryStringParams['dosage']) && $arrQueryStringParams['dosage']) {
+                                    //echo $arrQueryStringParams['doctorusername'];
+                                    $generatedToken = $arrQueryStringParams['token'];
+                                    $doctorUsername = $arrQueryStringParams['doctorusername'];
+                                    $patientUsername = $arrQueryStringParams['patientusername'];
+                                    $medicineInput = $arrQueryStringParams['medicine'];
+                                    $dosageInput = $arrQueryStringParams['dosage'];
+                                }
+                            }
+                        }  
+                    }
+                }
+
+                $arrPrescriptions = $userModel->addPrescription($generatedToken, $doctorUsername, $patientUsername, $medicineInput, $dosageInput);
+                $responseData = json_encode($arrPrescriptions);
+            } 
+            catch (Error $e) 
+            {
+                $strErrorDesc = $e->getMessage().'Something went wrong! Please contact support.';
+                $strErrorHeader = 'HTTP/1.1 500 Internal Server Error';
+            }
+        } else {
+            $strErrorDesc = 'Method not supported';
+            $strErrorHeader = 'HTTP/1.1 422 Unprocessable Entity';
+        }
+ 
+        // send output
+        if (!$strErrorDesc) {
+            $this->sendOutput(
+                $responseData,
+                array('Content-Type: application/json', 'HTTP/1.1 200 OK')
+            );
+        } else {
+            $this->sendOutput(json_encode(array('error' => $strErrorDesc)), 
+                array('Content-Type: application/json', $strErrorHeader)
+            );
+        }
+    }
+
+
+    /** Admin Add User  **/
+    public function adminAddUserAction()
+    {
+        $strErrorDesc = '';
+        $requestMethod = $_SERVER["REQUEST_METHOD"];
+        $arrQueryStringParams = $this->getQueryStringParams();
+
+        if (strtoupper($requestMethod) == 'GET') {
+            try 
+            {
+                $userModel = new UserModel();
+                $userName = '';
+                $pwd = '';
+                $inputRole = '';
+                $inputEmail = '';
+                $inputPhone = '';
+
+                if (isset($arrQueryStringParams['username']) && $arrQueryStringParams['username']) {
+                    if (isset($arrQueryStringParams['password']) && $arrQueryStringParams['password']) {
+                        if (isset($arrQueryStringParams['role']) && $arrQueryStringParams['role']) {
+                            if (isset($arrQueryStringParams['email']) && $arrQueryStringParams['email']) {
+                                if (isset($arrQueryStringParams['phone']) && $arrQueryStringParams['phone']) {
+                                    //echo $arrQueryStringParams['username'];
+                                    $userName = $arrQueryStringParams['username'];
+                                    $pwd = $arrQueryStringParams['password'];
+                                    $inputRole = $arrQueryStringParams['role'];
+                                    $inputEmail = $arrQueryStringParams['email'];
+                                    $inputPhone = $arrQueryStringParams['phone'];
+                                }
+                            }
+                        }  
+                    }
+                }
+
+                $arrAddUser = $userModel->addUser($userName, $pwd, $inputRole, $inputEmail, $inputPhone);
+                $responseData = json_encode($arrAddUser);
+            } 
+            catch (Error $e) 
+            {
+                $strErrorDesc = $e->getMessage().'Something went wrong! Please contact support.';
+                $strErrorHeader = 'HTTP/1.1 500 Internal Server Error';
+            }
+        } else {
+            $strErrorDesc = 'Method not supported';
+            $strErrorHeader = 'HTTP/1.1 422 Unprocessable Entity';
+        }
+ 
+        // send output
+        if (!$strErrorDesc) {
+            $this->sendOutput(
+                $responseData,
+                array('Content-Type: application/json', 'HTTP/1.1 200 OK')
+            );
+        } else {
+            $this->sendOutput(json_encode(array('error' => $strErrorDesc)), 
+                array('Content-Type: application/json', $strErrorHeader)
+            );
+        }
+    }
+
+
+    /** Pharmacist View Patient Prescription by token **/
+    public function pharmacistViewPrescriptionAction()
+    {
+        $strErrorDesc = '';
+        $requestMethod = $_SERVER["REQUEST_METHOD"];
+        $arrQueryStringParams = $this->getQueryStringParams();
+
+        if (strtoupper($requestMethod) == 'GET') {
+            try 
+            {
+                $userModel = new UserModel();
+                
+                $tokenInput = '';
+                if (isset($arrQueryStringParams['token']) && $arrQueryStringParams['token']) {
+                    $tokenInput = $arrQueryStringParams['token'];
+                    
+                }
+
+                $arrPrescriptions = $userModel->getPrescriptionByToken($tokenInput);
+                $responseData = json_encode($arrPrescriptions);
+            } 
+            catch (Error $e) 
+            {
+                $strErrorDesc = $e->getMessage().'Something went wrong! Please contact support.';
+                $strErrorHeader = 'HTTP/1.1 500 Internal Server Error';
+            }
+        } else {
+            $strErrorDesc = 'Method not supported';
+            $strErrorHeader = 'HTTP/1.1 422 Unprocessable Entity';
+        }
+ 
+        // send output
+        if (!$strErrorDesc) {
+            $this->sendOutput(
+                $responseData,
+                array('Content-Type: application/json', 'HTTP/1.1 200 OK')
+            );
+        } else {
+            $this->sendOutput(json_encode(array('error' => $strErrorDesc)), 
+                array('Content-Type: application/json', $strErrorHeader)
+            );
+        }
+    }
 }
