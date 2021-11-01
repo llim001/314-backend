@@ -23,7 +23,7 @@ class UserModel extends Database
     public function getPrescriptionByUsername($usernameInput)
     {
         //return $this->select("SELECT token,doctor_username,medicine,dosage,date_issued FROM prescription WHERE username = ? ", ["s", $usernameInput]);
-		return $this->select("SELECT token,doctor_username,medicine,dosage,DATE_FORMAT(date_issued,'%d %b %Y')as date FROM prescription WHERE username = '$usernameInput' ORDER BY DATE,TOKEN,MEDICINE ASC");
+		return $this->select("SELECT token,doctor_username,medicine,dosage,DATE_FORMAT(date_issued,'%d %b %Y')as date, date_dispense FROM prescription WHERE username = '$usernameInput' ORDER BY DATE,TOKEN,MEDICINE ASC");
     }
 
 	//view prescription Doctor
