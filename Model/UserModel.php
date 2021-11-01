@@ -79,7 +79,7 @@ class UserModel extends Database
 	public function addPrescription($token, $doctorUsername, $usernameInput, $medicine, $dosage)
 	{
 		$dtnow = date('Y-m-d H:i:s');
-		return $this->select("INSERT INTO prescription(Token, Doctor_Username, Username, Medicine , Dosage, Date_Issued) VALUES ('$token', '$doctorUsername', '$usernameInput', '$medicine', '$dosage', '$dtnow'");
+		return $this->insert("INSERT INTO prescription(Token, Doctor_Username, Username, Medicine , Dosage, Date_Issued) VALUES ('$token', '$doctorUsername', '$usernameInput', '$medicine', '$dosage', '$dtnow')");
 	}
 	
 	//update prescription Pharmacist
@@ -89,4 +89,10 @@ class UserModel extends Database
 		return $this->select("UPDATE prescription SET Date_Dispense = '$dtnow', status = '1' where Token = '$token'");
 	}
 	
+
+	//add user Admin
+	public function addUser($username, $password, $role, $email, $phone)
+	{
+		return $this->insert("INSERT INTO userinfo(username, password, role, email , phone) VALUES ('$username', '$password', '$role', '$email', '$phone')");
+	}
 }
