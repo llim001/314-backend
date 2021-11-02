@@ -50,4 +50,18 @@ class Database
             throw New Exception( $e->getMessage() );
         }   
     }
+
+    public function insert($query = "" , $params = [])
+    {
+        try {
+            $stmt = $this->executeStatement( $query , $params );
+            //$result = $stmt->get_result()->fetch_all(MYSQLI_ASSOC);               
+            $stmt->close();
+ 
+            return true;
+        } catch(Exception $e) {
+            throw New Exception( $e->getMessage() );
+        }
+        return false;
+    }
 }
