@@ -33,6 +33,12 @@ class UserModel extends Database
 		return $this->select("SELECT username,medicine,dosage,DATE_FORMAT(date_issued,'%d %b %Y')as date,token FROM prescription WHERE Doctor_Username = '$usernameInput' ORDER BY USERNAME,MEDICINE,DATE ASC");
     }
 
+    public function getPatientsPrescriptionByToken($usernameInput, $token)
+    {
+        //return $this->select("SELECT token,doctor_username,medicine,dosage,date_issued FROM prescription WHERE Doctor_Username = ? ", ["s", $usernameInput]);
+		return $this->select("SELECT username,medicine,dosage,DATE_FORMAT(date_issued,'%d %b %Y')as date,token,status FROM prescription WHERE Doctor_Username = '$usernameInput' AND Token = '$token' ORDER BY USERNAME,MEDICINE,DATE ASC");
+    }
+
     public function getPatientsPrescriptionByPatientId($docUserInput, $patientUserInput)
     {
         //return $this->select("SELECT token,doctor_username,medicine,dosage,date_issued FROM prescription WHERE Doctor_Username = ? ", ["s", $usernameInput]);
@@ -86,7 +92,7 @@ class UserModel extends Database
 	public function updatePrescription($token)
 	{
 		$dtnow = date('Y-m-d H:i:s');
-		return $this->select("UPDATE prescription SET Date_Dispense = '$dtnow', status = '1' where Token = '$token'");
+		return $this->insert("UPDATE prescription SET Date_Dispense = '$dtnow', status = '1' where Token = '$token'");
 	}
 	
 
@@ -94,5 +100,19 @@ class UserModel extends Database
 	public function addUser($username, $password, $role, $email, $phone)
 	{
 		return $this->insert("INSERT INTO userinfo(username, password, role, email , phone) VALUES ('$username', '$password', '$role', '$email', '$phone')");
+	}
+
+
+	//Display Prescription by Token and Doctor
+	public function displayPrescriptionByTokenAndDoctor($token, $doctorUsername)
+    {
+		return $this->select("SELECT token,doctor_username,medicine,dosage,DATE_FORMAT(date_issued,'%d %b %Y')as date FROM prescription WHERE Token = '$token' AND doctor_username = '$doctorUsername' AND status = 0 ORDER BY DATE,TOKEN,MEDICINE ASC");
+    }
+	
+	//update prescription doctor
+	public function doctorUpdatePrescription($token, $currentMedicine, $currentDosage, $newMedicine, $newDosage)
+	{
+		$dtnow = date('Y-m-d H:i:s');
+		return $this->insert("UPDATE prescription SET Medicine = '$newMedicine', Dosage = '$newDosage', Date_Issued = '$dtnow' WHERE Token = '$token' AND Medicine = '$currentMedicine' AND Dosage = '$currentDosage'");
 	}
 }
