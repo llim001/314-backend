@@ -8,6 +8,11 @@ class UserModel extends Database
         return $this->select("SELECT username,password,role,email,phone FROM userinfo ORDER BY ROLE,USERNAME ASC");
     }
 
+    public function getPatientEmail($usernameInput)
+    {
+        return $this->select("SELECT email FROM userinfo WHERE username = '$usernameInput'");
+    }
+
     public function getUserByUsernamePassword($usernameInput, $passwordInput)
     {
         return $this->select("SELECT username,role,email,phone FROM userinfo WHERE username = ? AND password = ? LIMIT 1", ["ss", [$usernameInput, $passwordInput]]);
@@ -36,7 +41,7 @@ class UserModel extends Database
     public function getPatientsPrescriptionByToken($usernameInput, $token)
     {
         //return $this->select("SELECT token,doctor_username,medicine,dosage,date_issued FROM prescription WHERE Doctor_Username = ? ", ["s", $usernameInput]);
-		return $this->select("SELECT username,medicine,dosage,DATE_FORMAT(date_issued,'%d %b %Y')as date,token,status FROM prescription WHERE Doctor_Username = '$usernameInput' AND Token = '$token' ORDER BY USERNAME,MEDICINE,DATE ASC");
+		return $this->select("SELECT token,username,medicine,dosage,DATE_FORMAT(date_issued,'%d %b %Y')as date,status FROM prescription WHERE Doctor_Username = '$usernameInput' AND Token = '$token' ORDER BY USERNAME,MEDICINE,DATE ASC");
     }
 
     public function getPatientsPrescriptionByPatientId($docUserInput, $patientUserInput)
