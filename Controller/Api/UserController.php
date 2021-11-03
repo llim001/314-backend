@@ -59,8 +59,16 @@ class UserController extends BaseController
             try
             {
                 $inputEmail = '';
+                $tokenInput = '';
+                $patientUsername = '';
                 if (isset($arrQueryStringParams['email']) && $arrQueryStringParams['email']) {
-                    $inputEmail = $arrQueryStringParams['email'];
+                    if (isset($arrQueryStringParams['token']) && $arrQueryStringParams['token']) {
+                        if (isset($arrQueryStringParams['patientusername']) && $arrQueryStringParams['patientusername']) {
+                            $inputEmail = $arrQueryStringParams['email'];
+                            $tokenInput = $arrQueryStringParams['token'];
+                            $patientUsername = $arrQueryStringParams['patientusername'];
+                        }
+                    }
                 }
                 // SEND
                 $email = new \SendGrid\Mail\Mail();
@@ -69,10 +77,10 @@ class UserController extends BaseController
                 $email->addTo($inputEmail, "Patient");
                 $email->addContent("text/plain", "and easy to do anywhere, even with PHP + string");
                 $email->addContent(
-                    "text/html", "Hi <strong>username</strong>, this is the token to your prescription: <strong>Token</strong>"
+                    "text/html", "Hi <strong>{$patientUsername}</strong>, this is the token to your prescription: <strong>{$tokenInput}</strong>"
                 );
-                //$sendgrid = new \SendGrid(getenv('SENDGRID_API_KEY'));
-                $sendgrid = new \SendGrid('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');
+                $sendgrid = new \SendGrid(getenv('SENDGRID_API_KEY'));
+                
                 try {
                     $response = $sendgrid->send($email);
 //                    echo $response->statusCode() . "\n";
@@ -105,6 +113,49 @@ class UserController extends BaseController
             );
         } else {
             $this->sendOutput(json_encode(array('error' => $strErrorDesc)),
+                array('Content-Type: application/json', $strErrorHeader)
+            );
+        }
+    }
+
+
+    // Get Patient Email
+    public function getPatientEmailAction()
+    {
+        $strErrorDesc = '';
+        $requestMethod = $_SERVER["REQUEST_METHOD"];
+        $arrQueryStringParams = $this->getQueryStringParams();
+
+        if (strtoupper($requestMethod) == 'GET') {
+            try 
+            {
+                $userModel = new UserModel();
+                
+                $patientUsername = '';
+                if (isset($arrQueryStringParams['patientusername']) && $arrQueryStringParams['patientusername']) {
+                    $patientUsername = $arrQueryStringParams['patientusername'];
+                }
+                $patientEmail = $userModel->getPatientEmail($patientUsername);
+                $responseData = json_encode($patientEmail);
+            } 
+            catch (Error $e) 
+            {
+                $strErrorDesc = $e->getMessage().'Something went wrong! Please contact support.';
+                $strErrorHeader = 'HTTP/1.1 500 Internal Server Error';
+            }
+        } else {
+            $strErrorDesc = 'Method not supported';
+            $strErrorHeader = 'HTTP/1.1 422 Unprocessable Entity';
+        }
+ 
+        // send output
+        if (!$strErrorDesc) {
+            $this->sendOutput(
+                $responseData,
+                array('Content-Type: application/json', 'HTTP/1.1 200 OK')
+            );
+        } else {
+            $this->sendOutput(json_encode(array('error' => $strErrorDesc)), 
                 array('Content-Type: application/json', $strErrorHeader)
             );
         }
