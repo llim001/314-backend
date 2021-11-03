@@ -71,13 +71,15 @@ class UserController extends BaseController
                     }
                 }
                 // SEND
+                $googlechart_qr_code = "https://chart.googleapis.com/chart?chs=200x200&cht=qr&chl=".$tokenInput."&choe=UTF-8";
+
                 $email = new \SendGrid\Mail\Mail();
                 $email->setFrom("prescriptionsystem@em4476.nameless.guardurl.com", "Prescription System");
                 $email->setSubject("Your Prescription String");
                 $email->addTo($inputEmail, "Patient");
                 $email->addContent("text/plain", "and easy to do anywhere, even with PHP + string");
                 $email->addContent(
-                    "text/html", "Hi <strong>{$patientUsername}</strong>, this is the token to your prescription: <strong>{$tokenInput}</strong>"
+                    "text/html", "Hi <strong>{$patientUsername}</strong>, this is the token to your prescription: <strong>{$tokenInput}</strong><br />QR Code: <br /><img src='".$googlechart_qr_code."' alt='".$tokenInput."'>"
                 );
                 $sendgrid = new \SendGrid(getenv('SENDGRID_API_KEY'));
                 
