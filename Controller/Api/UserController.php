@@ -769,4 +769,117 @@ class UserController extends BaseController
             );
         }
     }
+
+
+    /** Admin Update User Info **/
+    public function adminUpdateUserInfoAction()
+    {
+        $strErrorDesc = '';
+        $requestMethod = $_SERVER["REQUEST_METHOD"];
+        $arrQueryStringParams = $this->getQueryStringParams();
+
+        if (strtoupper($requestMethod) == 'GET') {
+            try 
+            {
+                $userModel = new UserModel();
+                
+                $usernameInput = '';
+                $currentPasswordInput = '';
+                $currentEmailInput = '';
+                $currentPhoneInput = '';
+                $newPasswordInput = '';
+                $newEmailInput = '';
+                $newPhoneInput = '';
+                if (isset($arrQueryStringParams['username']) && $arrQueryStringParams['username']) {
+                    if (isset($arrQueryStringParams['cpassword']) && $arrQueryStringParams['cpassword']) {
+                        if (isset($arrQueryStringParams['cemail']) && $arrQueryStringParams['cemail']) {
+                            if (isset($arrQueryStringParams['cphone']) && $arrQueryStringParams['cphone']) {
+                                if (isset($arrQueryStringParams['npassword']) && $arrQueryStringParams['npassword']) {
+                                    if (isset($arrQueryStringParams['nemail']) && $arrQueryStringParams['nemail']) {
+                                        if (isset($arrQueryStringParams['nphone']) && $arrQueryStringParams['nphone']) {
+                                            $usernameInput = $arrQueryStringParams['username'];
+                                            $currentPasswordInput = $arrQueryStringParams['cpassword'];
+                                            $currentEmailInput = $arrQueryStringParams['cemail'];
+                                            $currentPhoneInput = $arrQueryStringParams['cphone'];
+                                            $newPasswordInput = $arrQueryStringParams['npassword'];
+                                            $newEmailInput = $arrQueryStringParams['nemail'];
+                                            $newPhoneInput = $arrQueryStringParams['nphone'];
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                    
+                }
+                $updatedUserInfo = $userModel->adminUpdateUserInfo($usernameInput, $currentPasswordInput, $currentEmailInput, $currentPhoneInput, $newPasswordInput, $newEmailInput, $newPhoneInput);
+                $responseData = json_encode($updatedUserInfo);
+            } 
+            catch (Error $e) 
+            {
+                $strErrorDesc = $e->getMessage().'Something went wrong! Please contact support.';
+                $strErrorHeader = 'HTTP/1.1 500 Internal Server Error';
+            }
+        } else {
+            $strErrorDesc = 'Method not supported';
+            $strErrorHeader = 'HTTP/1.1 422 Unprocessable Entity';
+        }
+ 
+        // send output
+        if (!$strErrorDesc) {
+            $this->sendOutput(
+                $responseData,
+                array('Content-Type: application/json', 'HTTP/1.1 200 OK')
+            );
+        } else {
+            $this->sendOutput(json_encode(array('error' => $strErrorDesc)), 
+                array('Content-Type: application/json', $strErrorHeader)
+            );
+        }
+    }
+
+
+
+    /** Pharmacist Update Prescription status (Checkout) **/
+    public function pharmacistUpdatePrescriptionStatusAction()
+    {
+        $strErrorDesc = '';
+        $requestMethod = $_SERVER["REQUEST_METHOD"];
+        $arrQueryStringParams = $this->getQueryStringParams();
+
+        if (strtoupper($requestMethod) == 'GET') {
+            try 
+            {
+                $userModel = new UserModel();
+
+                $tokenInput = '';
+                if (isset($arrQueryStringParams['token']) && $arrQueryStringParams['token']) {
+                    $tokenInput = $arrQueryStringParams['token'];      
+                }
+
+                $updatedStatus = $userModel->updatePrescription($tokenInput);
+                $responseData = json_encode($updatedStatus);
+            } 
+            catch (Error $e) 
+            {
+                $strErrorDesc = $e->getMessage().'Something went wrong! Please contact support.';
+                $strErrorHeader = 'HTTP/1.1 500 Internal Server Error';
+            }
+        } else {
+            $strErrorDesc = 'Method not supported';
+            $strErrorHeader = 'HTTP/1.1 422 Unprocessable Entity';
+        }
+ 
+        // send output
+        if (!$strErrorDesc) {
+            $this->sendOutput(
+                $responseData,
+                array('Content-Type: application/json', 'HTTP/1.1 200 OK')
+            );
+        } else {
+            $this->sendOutput(json_encode(array('error' => $strErrorDesc)), 
+                array('Content-Type: application/json', $strErrorHeader)
+            );
+        }
+    }
 }
