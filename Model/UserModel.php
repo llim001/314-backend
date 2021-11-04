@@ -120,4 +120,10 @@ class UserModel extends Database
 		$dtnow = date('Y-m-d H:i:s');
 		return $this->insert("UPDATE prescription SET Medicine = '$newMedicine', Dosage = '$newDosage', Date_Issued = '$dtnow' WHERE Token = '$token' AND Medicine = '$currentMedicine' AND Dosage = '$currentDosage'");
 	}
+
+	//Admin update user information
+	public function adminUpdateUserInfo($username, $currentPassword, $currentEmail, $currentPhone, $newPassword, $newEmail, $newPhone)
+	{
+		return $this->insert("UPDATE userinfo SET Password = '$newPassword', Email = '$newEmail', Phone = '$newPhone' WHERE Username = '$username' AND Password = '$currentPassword' AND Email = '$currentEmail' AND Phone = '$currentPhone'");
+	}
 }
