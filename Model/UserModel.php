@@ -54,13 +54,13 @@ class UserModel extends Database
 	public function getPrescriptionByToken($token)
     {
 		//return $this->select("SELECT token,doctor_username,medicine,dosage,DATE_FORMAT(date_issued,'%d %b %Y')as date FROM prescription WHERE Token = '$token' ORDER BY DATE,TOKEN,MEDICINE ASC");
-		return $this->select("SELECT token,doctor_username,medicine,dosage,DATE_FORMAT(date_issued,'%d %b %Y')as date FROM prescription WHERE Token = '$token' ORDER BY DATE,TOKEN,MEDICINE ASC");
+		return $this->select("SELECT token,doctor_username,medicine,dosage,DATE_FORMAT(date_issued,'%d %b %Y')as date, date_dispense FROM prescription WHERE Token = '$token' ORDER BY DATE,TOKEN,MEDICINE ASC");
     }
 
     //Display prescription by Token (Patients)
 	public function displayPrescriptionByToken($token, $usernameInput)
     {
-		return $this->select("SELECT token,doctor_username,medicine,dosage,DATE_FORMAT(date_issued,'%d %b %Y')as date FROM prescription WHERE Token = '$token' AND username = '$usernameInput' ORDER BY DATE,TOKEN,MEDICINE ASC");
+		return $this->select("SELECT token,doctor_username,medicine,dosage,DATE_FORMAT(date_issued,'%d %b %Y')as date, date_dispense FROM prescription WHERE Token = '$token' AND username = '$usernameInput' ORDER BY DATE,TOKEN,MEDICINE ASC");
     }
 	
 	//view prescription Doctor and patient
